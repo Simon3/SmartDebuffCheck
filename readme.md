@@ -1,5 +1,5 @@
 SmartDebuffCheck is a simple WoW 1.12 addon to check if your target has the proper debuffs applied, taking into consideration the raid composition. 
-Originally written by Snelf and currently maintained by Dekos (<Nightcall> guild, Anathema server, Elysium Project). 
+Originally written by Snelf and currently maintained by Dekos (*Nightcall* guild, Anathema server, Elysium Project). 
 
 The in-game command to display missing debuffs on your target is /sdc (I would advise to macro this command so you can easily use it during a fight). 
 
