@@ -1,6 +1,8 @@
 SmartDebuffCheck is a simple WoW 1.12 addon to check if your target has the proper debuffs applied, taking into consideration the raid composition. 
 Originally written by Snelf and currently maintained by Dekos (*Nightcall* guild, Anathema server, Elysium Project). 
 
+![example](https://img11.hostingpics.net/pics/488511sdcexamplesmall.jpg)
+
 The in-game command to display missing debuffs on your target is /sdc (I would advise to macro this command so you can easily use it during a fight). 
 
 The addon is delivered ready to use, but it's also highly customisable since different guilds might optimize their debuffs in different ways. For a list of all the commands available, type /sdchelp. To display your current settings, type /sdc settings. Among others, you can choose in which channel you want to display the missing debuffs, you can toggle the display of most of the debuffs like Faerie Fire, Shadow Weaving or Nightfall, and you can even personalize your mage and warlock debuffs. Note that if you don't change anything, the addon will decide himself which debuffs should be applied based on several factors like your raid composition, the raid instance you're in or even the boss you're facing. There is also a "Trash debuffs" option that allows you to display the debuffs that should *not* be on the boss, but it's currently experimental. 
