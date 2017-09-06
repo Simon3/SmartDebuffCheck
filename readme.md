@@ -1,3 +1,5 @@
+#SmartDebuffCheck
+
 SmartDebuffCheck is a simple WoW 1.12 addon to check if your target has the proper debuffs applied, taking into consideration the raid composition. 
 Originally written by Snelf and currently maintained by Dekos (*Nightcall* guild, Anathema server, Elysium Project). 
 
@@ -11,3 +13,6 @@ The code of the addon is pretty straightforward so advanced users should not hes
 - Add or remove *dangerous bosses* that require Demo Shout and Thunderclap, if using the default settings (top of the file); 
 - Add or remove *allowed debuffs* for the "Trash debuffs" option (top of the file too); 
 - Change the way some debuffs are handled by default, for example mage debuffs or warlock curses. 
+
+## How to install
+You can download the archive via Githut by clicking on *Clone or Download* -> *Download ZIP*. Then you will need to extract it, remove the *-master* at the end of the name of the folder, and finally move it to your WoW/Interface/AddOns folder. 
