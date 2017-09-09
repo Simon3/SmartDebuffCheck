@@ -51,8 +51,12 @@ function SDCHelp()
 	SDCChat("Toggles the display of trash debuffs (default: OFF)")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc curses default | cor &| coe &| cos | nothing")
 	SDCChat("Sets the display of warlock curses. By default, it prioritizes CoR > CoE > CoS. Example : '/sdc curses coe cos' if you don't want to use CoR")
-	DEFAULT_CHAT_FRAME:AddMessage("/sdc mage default | scorch &| wc | nothing")
-	SDCChat("Sets the display of mage debuffs. By default, it will display Scorches only, if you're not in MC/BWL/Onyxia. You can also choose to display scorches and/or WC all the time. ")
+	DEFAULT_CHAT_FRAME:AddMessage("/sdc mage default")
+	SDCChat("Sets the display of mage debuffs to default: it will display Scorches only, and only if you're not in MC/BWL/Onyxia. ")
+	DEFAULT_CHAT_FRAME:AddMessage("/sdc scorch or /sdc scorches")
+	SDCChat("Toggles the display of mage scorches")
+	DEFAULT_CHAT_FRAME:AddMessage("/sdc wc")
+	SDCChat("Toggles the display of mage Winter's Chill")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc ff")
 	SDCChat("Toggles the display of Faerie Fire (default: ON)")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc sw")
@@ -91,13 +95,9 @@ function settings(msg)
 			if string.find(msg, "coe") then displayCoE = not displayCoE end
 			if string.find(msg, "cos") then displayCoS = not displayCoS end
 		end
-	elseif string.find(msg, "mage") then
-		if string.find(msg, "default") then customMage = false
-		else
-			customMage = true
-			if string.find(msg, "scorch") or string.find(msg, "scorches") then displayScorch = not displayScorch end
-			if string.find(msg, "wc") or string.find(msg, "winter") then displayWC = not displayWC end
-		end
+	elseif msg == "mage default" then customMage = false; displayScorch = false; displayWC = false
+	elseif msg == "scorch" or msg == "scorches" then customMage = true; displayScorch = not displayScorch
+	elseif msg == "wc" or msg == "winter" then customMage = true; displayWC = not displayWC
 
 	elseif string.find(msg, "demo") or string.find(msg, "demo shout") or string.find(msg, "demoralizing shout") then
 		if string.find(msg, "default") then customDemo = false
@@ -309,13 +309,14 @@ function SmartDebuffCheck(msg)
 		end
 		
 		if mage then
-			if GetRealZoneText() ~= "Molten Core" and GetRealZoneText() ~= "Blackwing Lair" and GetRealZoneText() ~= "Onyxia\'s Lair" or customMage and displayScorch then
+			if not customMage and GetRealZoneText() ~= "Molten Core" and GetRealZoneText() ~= "Blackwing Lair" and GetRealZoneText() ~= "Onyxia\'s Lair" or customMage and displayScorch then
 				if not Scorch then
 					s = s.." 5xScorch,"
 				elseif ScorchN < 5 then
 					s = s.." "..(5 - ScorchN).."xScorch,"
 				end
-			elseif customMage and displayWC then
+			end
+			if customMage and displayWC then
 				if not WC then
 					s = s.." 5xWinter's Chill,"
 				elseif WCN < 5 then
