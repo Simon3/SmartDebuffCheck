@@ -17,15 +17,17 @@ local allowed_debuffs = {
 	"Interface\\Icons\\Spell_Shadow_SiphonMana", -- Mindflay
 	"Interface\\Icons\\Spell_Shadow_UnsummonBuilding", -- Vamp Embrace
 	"Interface\\Icons\\Spell_Nature_ThunderClap", -- TC
-	"Interface\\Icons\\Spell_Holy_ElunesGrace", -- Nightfall
 	"Interface\\Icons\\Ability_BackStab", -- Deep Wounds
 	"Interface\\Icons\\Spell_Fire_FlameBolt", -- Fireball
-	"Interface\\Icons\\Spell_Fire_Fireball", -- Dragonling
 	"Interface\\Icons\\Spell_Nature_Cyclone", -- Thunderfury
 	"Interface\\Icons\\Spell_Fire_Incinerate", -- Ignite
 	"Interface\\Icons\\Spell_Shadow_ShadowWordPain", -- SW:P
-	"Interface\\Icons\\Inv_Axe_12", -- Annihilator stacks
-} -- TODO add mana drains
+	"Interface\\Icons\\INV_Axe_12", -- Annihilator stacks
+	"Interface\\Icons\\Ability_Hunter_AimedShot", -- Hunter's mana drain
+	"Interface\\Icons\\Spell_Shadow_SiphonMana", -- Warlock's mana drain
+	--"Interface\\Icons\\Ability_Hunter_SniperShot", -- Hunter's Mark
+	--"Interface\\Icons\\Ability_GhoulFrenzy", -- Druid's Rip
+} 
 
 local dangerous_bosses = {"Princess Huhuran", "Emperor Vek'nilash", "Ouro", "Ossirian the Unscarred", "Broodlord Lashlayer", "Chromaggus", "Nefarian", "Elder Mottled Boar",}
 local nightfall_bosses = {"C'Thun", "Princess Huhuran", "Magmadar", "Baron Geddon", "Shazzrah",}
@@ -434,10 +436,11 @@ function SmartDebuffCheck(msg)
 	end
 end
 
--- Helper function
+-- Helper function checking is the string 'val' is contained in the table 'tab'
+-- Note : the comparison is not case-sensitive
 function has_value(tab, val)
     for index, value in ipairs (tab) do
-        if value == val then
+        if string.lower(value) == string.lower(val) then
             return true
         end
     end
