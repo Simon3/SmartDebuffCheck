@@ -25,11 +25,11 @@ local allowed_debuffs = {
 	"Interface\\Icons\\Spell_Fire_Incinerate", -- Ignite
 	"Interface\\Icons\\Spell_Shadow_ShadowWordPain", -- SW:P
 	"Interface\\Icons\\Inv_Axe_12", -- Annihilator stacks
-}
+} -- TODO add mana drains
 
 local dangerous_bosses = {"Princess Huhuran", "Emperor Vek'nilash", "Ouro", "Ossirian the Unscarred", "Broodlord Lashlayer", "Chromaggus", "Nefarian", "Elder Mottled Boar",}
-local nightfall_bosses = {"C'Thun", "Princess Huhuran",}
-local dragonling_bosses = {"Eye of C'Thun", "C'Thun", "Fankriss the Unyielding", "Ouro", "High Priestess Arlokk",}
+local nightfall_bosses = {"C'Thun", "Princess Huhuran", "Magmadar", "Baron Geddon", "Shazzrah",}
+local dragonling_bosses = {"Eye of C'Thun", "C'Thun", "Ouro", "Fankriss the Unyielding", "Shazzrah", "High Priestess Arlokk", "Moam",}
 local no_scorches_bosses = {"Ossirian the Unscarred",}
 local no_scorches_instances = {"Molten Core", "Blackwing Lair", "Onyxia\'s Lair",}
 
