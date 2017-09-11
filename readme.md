@@ -13,7 +13,7 @@ Here is an example of output of the */sdc* command with all the debuffs currentl
 
 ![example](https://img11.hostingpics.net/pics/890735alldebuffs.png)
 
-And here is a more concrete case: using the command in the beginning of the phase 1 on C'Thun allows you to quickly figure out which debuffs are missing, for example here you can remind your warriors that they still didn't stack 5 Sunder Armor, your warlocks that one curse is still missing, and your druids that they forgot to apply Faerie Fire. Using it later allows you to make sure no debuff is missing, and that no debuff has faded (for example if warriors forget to refresh Sunder Armor). Later on, it's also useful to use it right before the transition to the Weakened Phase to make sure everything will be optimal for the next 45 seconds. 
+And here is a more concrete case: using the command in the beginning of the Phase 1 on C'Thun allows you to quickly figure out which debuffs are missing. For example, here you can remind your warriors that they still didn't stack 5 Sunder Armor, your warlocks that one curse is still missing, and your druids that they forgot to apply Faerie Fire. Using it later on allows you to make sure that no debuffs are missing, and to check that no debuffs have faded so far. It's also useful to use it right before the transition to the Weakened Phase to make sure everything will be optimal for the next 45 seconds. 
 
 ![example](https://img11.hostingpics.net/pics/210276sdccthun.png)
 
