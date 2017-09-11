@@ -1,12 +1,12 @@
--- Global variables, saved between sessions (initialized in resetSettings())
+-- Global variables, saved between sessions (initialized in reset_settings())
 useSay, useRaid, useYellow = nil, nil, nil -- where to display results of /sdc queries
 displayTrash = nil -- if you want to display trash debuffs
 displayFF, displaySW = nil, nil
-customMage, displayScorch, displayWC = nil, nil, nil
-displayNightfall = nil
+defaultScorch, displayScorch, displayWC = nil, nil, nil
+defaultNightfall, displayNightfall = nil, nil
 customCurses, displayCoR, displayCoE, displayCoS = nil, nil, nil, nil
-customDemo, displayDemo, customTC, displayTC = nil, nil, nil, nil
-displayDragonling = nil -- Dragonling's Flame Buffets
+defaultDemo, displayDemo, defaultTC, displayTC = nil, nil, nil, nil
+defaultDragonling, displayDragonling = nil, nil -- Dragonling's Flame Buffets
 
 local allowed_debuffs = {
 	"Interface\\Icons\\Ability_Physical_Taunt", -- taunt
@@ -24,12 +24,17 @@ local allowed_debuffs = {
 	"Interface\\Icons\\Spell_Nature_Cyclone", -- Thunderfury
 	"Interface\\Icons\\Spell_Fire_Incinerate", -- Ignite
 	"Interface\\Icons\\Spell_Shadow_ShadowWordPain", -- SW:P
+	"Interface\\Icons\\Inv_Axe_12", -- Annihilator stacks
 }
 
 local dangerous_bosses = {"Princess Huhuran", "Emperor Vek'nilash", "Ouro", "Ossirian the Unscarred", "Broodlord Lashlayer", "Chromaggus", "Nefarian", "Elder Mottled Boar",}
+local nightfall_bosses = {"C'Thun", "Princess Huhuran",}
+local dragonling_bosses = {"Eye of C'Thun", "C'Thun", "Fankriss the Unyielding", "Ouro", "High Priestess Arlokk",}
+local no_scorches_bosses = {"Ossirian the Unscarred",}
+local no_scorches_instances = {"Molten Core", "Blackwing Lair", "Onyxia\'s Lair",}
 
 function SDC_OnLoad()
-	resetSettings()
+	reset_settings()
 	DEFAULT_CHAT_FRAME:AddMessage("SmartDebuffCheck v1.4 by Dekos & Snelf loaded. /sdchelp for more info", 1, 1, 0)
 	SlashCmdList["SDCHELP"] = SDCHelp
 	SLASH_SDCHELP1 = "/sdchelp"
@@ -51,10 +56,8 @@ function SDCHelp()
 	SDCChat("Toggles the display of trash debuffs (default: OFF)")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc curses default | cor &| coe &| cos | nothing")
 	SDCChat("Sets the display of warlock curses. By default, it prioritizes CoR > CoE > CoS. Example : '/sdc curses coe cos' if you don't want to use CoR")
-	DEFAULT_CHAT_FRAME:AddMessage("/sdc mage default")
+	DEFAULT_CHAT_FRAME:AddMessage("/sdc scorch(es) default | always | never")
 	SDCChat("Sets the display of mage debuffs to default: it will display Scorches only, and only if you're not in MC/BWL/Onyxia. ")
-	DEFAULT_CHAT_FRAME:AddMessage("/sdc scorch or /sdc scorches")
-	SDCChat("Toggles the display of mage scorches")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc wc")
 	SDCChat("Toggles the display of mage Winter's Chill")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc ff")
@@ -65,18 +68,72 @@ function SDCHelp()
 	SDCChat("Sets the display of Demoralizing Shout. By default, it only displays it on some dangerous bosses. ")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc tc default | always | never")
 	SDCChat("Sets the display of Thunderclap. By default, it only displays it on some dangerous bosses. ")
-	DEFAULT_CHAT_FRAME:AddMessage("/sdc nf")
-	SDCChat("Toggles the display of Nightfall (default: OFF, except on C'thun)")
-	DEFAULT_CHAT_FRAME:AddMessage("/sdc dragonling")
-	SDCChat("Toggles the display of the Dragonling's debuffs (default: OFF, except on C'thun)")
+	DEFAULT_CHAT_FRAME:AddMessage("/sdc nf default | always | never")
+	SDCChat("Sets the display of Nightfall (default: OFF, except on some bosses)")
+	DEFAULT_CHAT_FRAME:AddMessage("/sdc dragonling default | always | never")
+	SDCChat("Sets the display of the Dragonling's debuffs (default: OFF, except some bosses)")
+	DEFAULT_CHAT_FRAME:AddMessage("/sdc all")
+	SDCChat("Sets the display of every debuff to true (you should probably not use this command)")
 end
 
 function SDCChat(msg)
 	DEFAULT_CHAT_FRAME:AddMessage(msg, 1, 1, 0)
 end
 
+function wrong_command()
+	SDCChat("[SmartDebuffCheck] Command not matching any keyword...")
+end
+
+-- Default values
+function reset_settings()
+	useSay = true
+	useRaid = false
+	useYellow = false
+	displayTrash = false
+	displayFF = true
+	displaySW = true
+	defaultScorch = true
+	displayScorch = false
+	displayWC = false
+	customCurses = false
+	displayCoR = false
+	displayCoE = false
+	displayCoS = false 
+	defaultDemo = true
+	displayDemo = false
+	defaultTC = true
+	displayTC = false
+	defaultNightfall = true
+	displayNightfall = false
+	defaultDragonling = true
+	displayDragonling = false
+end
+
+function all_true()
+	displayFF = true
+	displaySW = true
+	defaultScorch = false
+	displayScorch = true
+	displayWC = true
+	customCurses = true
+	displayCoR = true
+	displayCoE = true
+	displayCoS = true
+	defaultDemo = false
+	displayDemo = true
+	defaultTC = false
+	displayTC = true
+	defaultNightfall = false
+	displayNightfall = true
+	defaultDragonling = false
+	displayDragonling = true
+end
+
 function settings(msg)
-	if msg == "reset" then resetSettings()
+	if msg == nil or string.len(msg) < 2 then wrong_command() -- empty command
+	elseif msg == "settings" then do end -- do nothing, settings will be displayed anyway, but no 'wrong command' message
+	elseif msg == "reset" then reset_settings()
+	elseif msg == "all" then all_true()
 	elseif msg == "say" then useSay = true; useRaid = false; useYellow = false
 	elseif msg == "raid" then useRaid = true; useSay = false; useYellow = false
 	elseif msg == "yellow" then useYellow = true; useSay = false; useRaid = false
@@ -84,43 +141,64 @@ function settings(msg)
 	elseif msg == "trash" then displayTrash = not displayTrash
 	elseif msg == "ff" or msg == "faerie fire" then displayFF = not displayFF
 	elseif msg == "sw" or msg == "shadow weaving" then displaySW = not displaySW
-	elseif msg == "nf" or msg == "nightfall" then displayNightfall = not displayNightfall
-	elseif msg == "dragonling" or msg == "dragon" or msg == "dl" then displayDragonling = not displayDragonling
 
-	elseif string.find(msg, "curses") then
+	elseif first_word(msg) == "curses" then
 		if string.find(msg, "default") then customCurses = false
 		else
-			customCurses = true
-			if string.find(msg, "cor") then displayCoR = not displayCoR end
-			if string.find(msg, "coe") then displayCoE = not displayCoE end
-			if string.find(msg, "cos") then displayCoS = not displayCoS end
+			found = false
+			if string.find(msg, "cor") then displayCoR = not displayCoR; found = true end
+			if string.find(msg, "coe") then displayCoE = not displayCoE; found = true end
+			if string.find(msg, "cos") then displayCoS = not displayCoS; found = true end
+			
+			if not found and not string.find(msg, "nothing") then wrong_command()
+			else customCurses = true
+			end
 		end
-	elseif msg == "mage default" then customMage = false; displayScorch = false; displayWC = false
-	elseif msg == "scorch" or msg == "scorches" then customMage = true; displayScorch = not displayScorch
-	elseif msg == "wc" or msg == "winter" then customMage = true; displayWC = not displayWC
+	elseif first_word(msg) == "scorch" or first_word(msg) == "scorches" or first_word(msg) == "scorch(es)" then
+		if second_word(msg) == "default" then defaultScorch = true
+		elseif second_word(msg) == "always" then defaultScorch = false; displayScorch = true
+		elseif second_word(msg) == "never" then defaultScorch = false; displayScorch = false
+		else wrong_command() 
+		end
+	elseif msg == "wc" or msg == "winter" then displayWC = not displayWC
 
 	elseif string.find(msg, "demo") or string.find(msg, "demo shout") or string.find(msg, "demoralizing shout") then
-		if string.find(msg, "default") then customDemo = false
+		if string.find(msg, "default") then defaultDemo = true
 		elseif string.find(msg, "always") then
-			customDemo = true
+			defaultDemo = false
 			displayDemo = true
 		elseif string.find(msg, "never") then
-			customDemo = true
+			defaultDemo = false
 			displayDemo = false
 		end
 	elseif string.find(msg, "tc") or string.find(msg, "thunder") or string.find(msg, "thunderclap") then
-		if string.find(msg, "default") then customTC = false
+		if string.find(msg, "default") then defaultTC = true
 		elseif string.find(msg, "always") then
-			customTC = true
+			defaultTC = false
 			displayTC = true
 		elseif string.find(msg, "never") then
-			customTC = true
+			defaultTC = false
 			displayTC = false
 		end
+		
+	elseif first_word(msg) == "nf" or first_word(msg) == "nightfall" then 
+		if second_word(msg) == "default" then defaultNightfall = true
+		elseif second_word(msg) == "always" then defaultNightfall = false; displayNightfall = true
+		elseif second_word(msg) == "never" then defaultNightfall = false; displayNightfall = false
+		else wrong_command()
+		end
 
-	elseif msg ~= "settings" then SDCChat("Command not matching any keyword")
+	elseif first_word(msg) == "dragonling" or first_word(msg) == "dl" then
+		if second_word(msg) == "default" then defaultDragonling = true
+		elseif second_word(msg) == "always" then defaultDragonling = false; displayDragonling = true
+		elseif second_word(msg) == "never" then defaultDragonling = false; displayDragonling = false
+		else wrong_command()
+		end
+
+	else wrong_command()
 	end
-	current = "Current settings: "
+
+	current = "[SmartDebuffCheck] Current settings: "
 	current = current .. "Channel: "
 	if useSay then current = current .. "Say, "
 	elseif useRaid then current = current .. "Raid, "
@@ -130,50 +208,37 @@ function settings(msg)
 	current = current .. "Trash: " .. tostring(displayTrash) .. ", "
 	current = current .. "FF: " .. tostring(displayFF) .. ", "
 	current = current .. "SW: " .. tostring(displaySW) .. ", "
-	current = current .. "Nightfall: " .. tostring(displayNightfall) .. ", "
-	current = current .. "Dragonling: " .. tostring(displayDragonling) .. ", "
+
 	current = current .. "Curses: "
 	if not customCurses then current = current .. "default, "
 	else current = current .. "CoR=" .. tostring(displayCoR) .. ", CoE=" .. tostring(displayCoE) .. ", CoS=" .. tostring(displayCoS) .. ", "
 	end
-	current = current .. "Mage debuffs: "
-	if not customMage then current = current .. "default, "
-	else current = current .. "Scorches=" .. tostring(displayScorch) .. ", WC=" .. tostring(displayWC) .. ", "
+	current = current .. "Scorches: "
+	if defaultScorch then current = current .. "default, "
+	else current = current .. tostring(displayScorch) .. ", "
 	end
+	current = current .. "WC: " .. tostring(displayWC) .. ", "
 	current = current .. "Demo: "
-	if not customDemo then current = current .. "default, "
+	if defaultDemo then current = current .. "default, "
 	elseif displayDemo then current = current .. "always, "
 	else current = current .. "never, "
 	end
 	current = current .. "TC: "
-	if not customTC then current = current .. "default."
-	elseif displayTC then current = current .. "always."
-	else current = current .. "never."
+	if defaultTC then current = current .. "default, "
+	elseif displayTC then current = current .. "always, "
+	else current = current .. "never, "
 	end
-	SDCChat(current)
-end
 
--- Default values
-function resetSettings()
-	useSay = true
-	useRaid = false
-	useYellow = false
-	displayTrash = false
-	displayFF = true
-	displaySW = true
-	customMage = false
-	displayScorch = false
-	displayWC = false
-	displayNightfall = false
-	customCurses = false
-	displayCoR = false
-	displayCoE = false
-	displayCoS = false
-	customDemo = false
-	displayDemo = false
-	customTC = false
-	displayTC = false
-	displayDragonling = false
+	current = current .. "Nightfall: "
+	if defaultNightfall then current = current .. "default, "
+	else current = current .. tostring(displayNightfall) .. ", "
+	end
+	current = current .. "Dragonling: "
+	if defaultDragonling then current = current .. "default. "
+	else current = current .. tostring(displayDragonling) .. ". "
+	end
+
+	SDCChat(current)
 end
 
 function SmartDebuffCheck(msg)
@@ -260,24 +325,22 @@ function SmartDebuffCheck(msg)
 		t = string.sub(t, 1, -2).."."
 		
 		-- Handle missing debuffs
-		s = UnitName("target").." ("..(i-trashN)..") is missing"
+		local target = UnitName("target")
+		s = target.." ("..(i-trashN)..") is missing"
 		
 		if warrior then
 			if not SA then 
-				s = s.." 5xSunder Armor," 
+				s = s.." 5xSunder," 
 			elseif SAN < 5 then 
-				s = s.." "..(5 - SAN).."xSunder Armor," 
+				s = s.." "..(5 - SAN).."xSunder," 
 			end
 			
-			if customDemo and displayDemo or not customDemo and isDangerous(UnitName("target")) then
+			if not defaultDemo and displayDemo or defaultDemo and has_value(dangerous_bosses, target) then
 				if not Demo then s = s.." Demo Shout," end
 			end
-			if customTC and displayTC or not customTC and isDangerous(UnitName("target")) then
+			if not defaultTC and displayTC or defaultTC and has_value(dangerous_bosses, target) then
 				if not TC then s = s.." Thunderclap," end
 			end
-		end
-		if displayNightfall or UnitName("target") == "C'thun" then
-			if not Nightfall then s = s.." Nightfall," end
 		end
 
 		if warlock then
@@ -300,23 +363,23 @@ function SmartDebuffCheck(msg)
 						if not CoS then s = s.." CoS," end
 					end
 				elseif warlockno >= 3 then
-					if not CoS then s = s.." CoS," end
 					if mage then
 						if not CoE then s = s.." CoE," end
 					end
+					if not CoS then s = s.." CoS," end
 				end
 			end
 		end
 		
 		if mage then
-			if not customMage and GetRealZoneText() ~= "Molten Core" and GetRealZoneText() ~= "Blackwing Lair" and GetRealZoneText() ~= "Onyxia\'s Lair" or customMage and displayScorch then
+			if defaultScorch and not has_value(no_scorches_instances, GetRealZoneText()) and not has_value(no_scorches_bosses, target) or not defaultScorch and displayScorch then
 				if not Scorch then
 					s = s.." 5xScorch,"
 				elseif ScorchN < 5 then
 					s = s.." "..(5 - ScorchN).."xScorch,"
 				end
 			end
-			if customMage and displayWC then
+			if displayWC then
 				if not WC then
 					s = s.." 5xWinter's Chill,"
 				elseif WCN < 5 then
@@ -324,15 +387,21 @@ function SmartDebuffCheck(msg)
 				end
 			end
 		end
-		if displayFF and druid and not FF then s = s.." Faerie Fire," end
+
 		if displaySW and spriest then 
 			if not SW then 
-				s = s.." Shadow Weaving," 
+				s = s.." SW," 
 			elseif SWN and SWN < 5 then
-				s = s.." "..(5 - SWN).."xShadow Weaving,"
+				s = s.." "..(5 - SWN).."xSW,"
 			end
 		end
-		if displayDragonling or UnitName("target") == "C'thun" then
+		if displayFF and druid and not FF then s = s.." Faerie Fire," end
+		
+		if not defaultNightfall and displayNightfall or defaultNightfall and has_value(nightfall_bosses, target) then
+			if not Nightfall then s = s.." Nightfall," end
+		end
+		
+		if not defaultDragonling and displayDragonling or defaultDragonling and has_value(dragonling_bosses, target) then
 			if not Dragonling then
 				s = s.." Dragonling,"
 			elseif DragonlingN and DragonlingN < 5 then
@@ -349,7 +418,7 @@ function SmartDebuffCheck(msg)
 		elseif channel == "RAID_WARNING" and not IsRaidLeader() and not IsRaidOfficer() then
 			channel = "RAID"
 		end
-		if s == UnitName("target").." ("..(i-trashN)..") is missin\!" then s = UnitName("target").." ("..(i-trashN).."): no debuffs missing!" end
+		if s == target.." ("..(i-trashN)..") is missin\!" then s = target.." ("..(i-trashN).."): no debuffs missing!" end
 		if t == "Trash debuffs." then t = "No trash debuff!" end
 
 		if useYellow then
@@ -365,10 +434,6 @@ function SmartDebuffCheck(msg)
 	end
 end
 
-function isDangerous(boss)
-    return has_value(dangerous_bosses, boss)
-end
-
 -- Helper function
 function has_value(tab, val)
     for index, value in ipairs (tab) do
@@ -377,4 +442,25 @@ function has_value(tab, val)
         end
     end
     return false
+end
+
+-- Split function, returns a table
+function my_split(inputstr)
+        local t={}
+        for str in string.gfind(inputstr, "([^%s]+)") do -- Elysium implemented 'gfind' instead of 'gmatch'
+			table.insert(t, str)
+        end
+        return t
+end
+
+-- Returns the first word of a string
+function first_word(inputstr)
+	local t = my_split(inputstr)
+	return t[1] -- lua indexes start at 1
+end
+
+-- Returns the second word of a string
+function second_word(inputstr)
+	local t = my_split(inputstr)
+	return t[2] -- lua indexes start at 1
 end

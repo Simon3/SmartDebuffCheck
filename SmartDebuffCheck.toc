@@ -1,7 +1,7 @@
 ## Interface: 11200
 ## Title: SmartDebuffCheck
-## SavedVariables: useSay, useRaid, useYellow, displayTrash, displayFF, displaySW, customMage, displayScorch, displayWC, displayNightfall, customCurses, displayCoR, displayCoE, displayCoS, customDemo, displayDemo, customTC, displayTC, displayDragonling
-## Notes: Simple addon to check if your target has the proper debuffs applied, taking into consideration the raid composition.
+## SavedVariables: useSay, useRaid, useYellow, displayTrash, displayFF, displaySW, defaultScorch, displayScorch, displayWC, defaultNightfall, displayNightfall, customCurses, displayCoR, displayCoE, displayCoS, defaultDemo, displayDemo, defaultTC, displayTC, defaultDragonling, displayDragonling
+## Notes: Simple addon to check if your target has the proper debuffs applied, taking into consideration the raid composition and the current environment. 
 ## Author: Dekos, Snelf
 ## Version: 1.4
 SmartDebuffCheck.xml
