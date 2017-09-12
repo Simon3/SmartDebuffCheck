@@ -24,4 +24,4 @@ The code of the addon is pretty straightforward so advanced users should not hes
 - Add new supported debuffs, or change the way some debuffs are handled by default, for example mage debuffs or warlock curses. 
 
 ## How to install
-You can download the archive via Githut by clicking on *Clone or Download* -> *Download ZIP*. Then you will need to extract it, remove the *-master* at the end of the name of the folder, and finally move it to your WoW/Interface/AddOns folder. 
+You can download the archive via Github by clicking on *Clone or Download* -> *Download ZIP*. Then you will need to extract it, remove the *-master* at the end of the name of the folder, and finally move it to your WoW/Interface/AddOns folder. 
