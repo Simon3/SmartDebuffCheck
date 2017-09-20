@@ -1,5 +1,5 @@
 -- Global variables, saved between sessions (initialized in reset_settings())
-useSay, useRaid, useYellow = nil, nil, nil -- where to display results of /sdc queries
+useSay, useRaid, useRW, useYellow = nil, nil, nil -- where to display results of /sdc queries
 displayTrash = nil -- if you want to display trash debuffs
 displayFF, displaySW = nil, nil
 defaultScorch, displayScorch, displayWC = nil, nil, nil
@@ -29,9 +29,26 @@ local allowed_debuffs = {
 	--"Interface\\Icons\\Ability_GhoulFrenzy", -- Druid's Rip
 } 
 
-local dangerous_bosses = {"Princess Huhuran", "Emperor Vek'nilash", "Ouro", "Ossirian the Unscarred", "Broodlord Lashlayer", "Chromaggus", "Nefarian", "Elder Mottled Boar",}
-local nightfall_bosses = {"C'Thun", "Princess Huhuran", "Magmadar", "Baron Geddon", "Shazzrah",}
-local dragonling_bosses = {"Eye of C'Thun", "C'Thun", "Ouro", "Fankriss the Unyielding", "Shazzrah", "High Priestess Arlokk", "Moam",}
+-- TODO Add Death Knight Wing trash mobs ?
+local dangerous_bosses = {
+	"Ossirian the Unscarred", "Elder Mottled Boar", 
+	"Princess Huhuran", "Emperor Vek'nilash", "Ouro", 
+	"Broodlord Lashlayer", "Chromaggus", "Nefarian", 
+	"Anub'Rekhan", "Grand Widow Faerlina", "Maexxna", "Patchwerk", "Grobbulus", "Gluth", "Thaddius", "Feugen", "Stalagg", 
+	"Noth the Plaguebringer", "Heigan the Unclean", "Loatheb", "Instructor Razuvious", 
+	"Highlord Mograine", "Thane Korth'azz", "Lady Blaumeux", "Sir Zeliek", "Sapphiron", "Kel'Thuzad", 
+}
+local nightfall_bosses = {
+	"Magmadar", "Baron Geddon", "Shazzrah",
+	"C'Thun", "Princess Huhuran", 
+	"Anub'Rekhan", "Maexxna", "Patchwerk", "Grobbulus", "Gluth", "Thaddius", "Feugen", "Stalagg", 
+	"Noth the Plaguebringer", "Heigan the Unclean", "Loatheb", 
+}
+local dragonling_bosses = {
+	"High Priestess Arlokk", "Moam", "Shazzrah", 
+	"Fankriss the Unyielding", "Ouro", "Eye of C'Thun", "C'Thun", 
+	"Maexxna", "Patchwerk", "Loatheb", 
+}
 local no_scorches_bosses = {"Ossirian the Unscarred",}
 local no_scorches_instances = {"Molten Core", "Blackwing Lair", "Onyxia\'s Lair",}
 
@@ -52,10 +69,10 @@ function SDCHelp()
 	SDCChat("Displays current settings")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc reset")
 	SDCChat("Reset settings to their default value")
-	DEFAULT_CHAT_FRAME:AddMessage("/sdc say | raid | yellow | last")
-	SDCChat("Sets the channel to display results of /sdc. By default, it will be /s only. You can se it to the default yellow chat frame, or to the last chat frame used. ")
+	DEFAULT_CHAT_FRAME:AddMessage("/sdc say | raid | rw | yellow | last")
+	SDCChat("Sets the channel to display results of /sdc. By default, it will be /s. You can also set it to /raid, /rw, the default yellow chat frame, or to the last chat frame used. ")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc trash")
-	SDCChat("Toggles the display of trash debuffs (default: OFF)")
+	SDCChat("Toggles the display of 'trash' debuffs, i.e. debuffs that should not be applied (experimental, default: OFF)")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc curses default | cor &| coe &| cos | nothing")
 	SDCChat("Sets the display of warlock curses. By default, it prioritizes CoR > CoE > CoS. Example : '/sdc curses coe cos' if you don't want to use CoR")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc scorch(es) default | always | never")
@@ -90,6 +107,7 @@ end
 function reset_settings()
 	useSay = true
 	useRaid = false
+	useRW = false
 	useYellow = false
 	displayTrash = false
 	displayFF = true
@@ -136,10 +154,11 @@ function settings(msg)
 	elseif msg == "settings" then do end -- do nothing, settings will be displayed anyway, but no 'wrong command' message
 	elseif msg == "reset" then reset_settings()
 	elseif msg == "all" then all_true()
-	elseif msg == "say" then useSay = true; useRaid = false; useYellow = false
-	elseif msg == "raid" then useRaid = true; useSay = false; useYellow = false
-	elseif msg == "yellow" then useYellow = true; useSay = false; useRaid = false
-	elseif msg == "last" then useSay = false; useRaid = false; useYellow = false
+	elseif msg == "say" then useSay = true; useRaid = false; useRW = false; useYellow = false
+	elseif msg == "raid" then useRaid = true; useSay = false; useRW = false; useYellow = false
+	elseif msg == "rw" then useRaid = false; useSay = false; useRW = true; useYellow = false
+	elseif msg == "yellow" then useYellow = true; useSay = false; useRaid = false; useRW = false
+	elseif msg == "last" then useSay = false; useRaid = false; useRW = false; useYellow = false
 	elseif msg == "trash" then displayTrash = not displayTrash
 	elseif msg == "ff" or msg == "faerie fire" then displayFF = not displayFF
 	elseif msg == "sw" or msg == "shadow weaving" then displaySW = not displaySW
@@ -204,6 +223,7 @@ function settings(msg)
 	current = current .. "Channel: "
 	if useSay then current = current .. "Say, "
 	elseif useRaid then current = current .. "Raid, "
+	elseif useRW then current = current .. "RW, "
 	elseif useYellow then current = current .. "Yellow, "
 	else current = current .. "Last" .. ", "
 	end
@@ -428,6 +448,7 @@ function SmartDebuffCheck(msg)
 			if displayTrash then SDCChat(t) end
 		else
 			if useRaid then channel = "RAID"
+			elseif useRW then channel = "RAID_WARNING"
 			elseif useSay or channel == "WHISPER" then channel = "SAY"
 			end
 			SendChatMessage(s, channel, nil, chatnumber)
