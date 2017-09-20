@@ -13,6 +13,10 @@ Here is an example of output of the */sdc* command with all the debuffs currentl
 
 ![example](https://img11.hostingpics.net/pics/890735alldebuffs.png)
 
+And here is a more concrete case: using the command in the beginning of the Phase 1 on C'Thun allows you to quickly figure out which debuffs are missing. For example, here you can remind your warriors that they still didn't stack 5 Sunder Armor, your warlocks that one curse is still missing, and your druids that they forgot to apply Faerie Fire. The command also shows that although it seems like all the debuff slots are currently used, 5 of them are low-priority debuffs that could be replaced by more important ones. Using /sdc later on would allow you to make sure that no debuffs are missing, and to check that no debuffs have faded so far. It's also useful to use it right before the transition to the Weakened Phase to make sure everything will be optimal for the next 45 seconds. 
+
+![example](https://img11.hostingpics.net/pics/210276sdccthun.png)
+
 The code of the addon is pretty straightforward so advanced users should not hesitate to browse SmartDebuffCheck.lua if they think they could improve it. Among others, you could : 
 - Add or remove *dangerous bosses* that require Demo Shout and Thunderclap, if using the default settings; 
 - Same for *Nightfall bosses*, *Dragonling bosses* and some other default settings; 
@@ -20,4 +24,4 @@ The code of the addon is pretty straightforward so advanced users should not hes
 - Add new supported debuffs, or change the way some debuffs are handled by default, for example mage debuffs or warlock curses. 
 
 ## How to install
-You can download the archive via Githut by clicking on *Clone or Download* -> *Download ZIP*. Then you will need to extract it, remove the *-master* at the end of the name of the folder, and finally move it to your WoW/Interface/AddOns folder. 
+You can download the archive via Github by clicking on *Clone or Download* -> *Download ZIP*. Then you will need to extract it, remove the *-master* at the end of the name of the folder, and finally move it to your WoW/Interface/AddOns folder. 
