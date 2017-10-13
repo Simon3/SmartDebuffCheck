@@ -7,6 +7,7 @@ defaultNightfall, displayNightfall = nil, nil
 customCurses, displayCoR, displayCoE, displayCoS = nil, nil, nil, nil
 defaultDemo, displayDemo, defaultTC, displayTC = nil, nil, nil, nil
 defaultDragonling, displayDragonling = nil, nil -- Dragonling's Flame Buffets
+displayAnnihilator = nil
 
 local allowed_debuffs = {
 	"Interface\\Icons\\Ability_Physical_Taunt", -- taunt
@@ -29,28 +30,29 @@ local allowed_debuffs = {
 	--"Interface\\Icons\\Ability_GhoulFrenzy", -- Druid's Rip
 } 
 
--- TODO Add Death Knight Wing trash mobs ?
 local dangerous_bosses = {
 	"Ossirian the Unscarred", "Elder Mottled Boar", 
 	"Princess Huhuran", "Emperor Vek'nilash", "Ouro", 
 	"Broodlord Lashlayer", "Chromaggus", "Nefarian", 
-	"Anub'Rekhan", "Grand Widow Faerlina", "Maexxna", "Patchwerk", "Grobbulus", "Gluth", "Thaddius", "Feugen", "Stalagg", 
-	"Noth the Plaguebringer", "Heigan the Unclean", "Loatheb", "Instructor Razuvious", 
+	"Grand Widow Faerlina", "Maexxna", "Patchwerk", "Gluth", "Stalagg", 
+	"Heigan the Unclean", "Loatheb", "Instructor Razuvious", 
 	"Highlord Mograine", "Thane Korth'azz", "Lady Blaumeux", "Sir Zeliek", "Sapphiron", "Kel'Thuzad", 
 }
 local nightfall_bosses = {
 	"Magmadar", "Baron Geddon", "Shazzrah",
 	"C'Thun", "Princess Huhuran", 
-	"Anub'Rekhan", "Maexxna", "Patchwerk", "Grobbulus", "Gluth", "Thaddius", "Feugen", "Stalagg", 
-	"Noth the Plaguebringer", "Heigan the Unclean", "Loatheb", 
+	"Anub'Rekhan", "Maexxna", "Grobbulus", "Thaddius", 
+	"Heigan the Unclean", "Loatheb", 
 }
 local dragonling_bosses = {
 	"High Priestess Arlokk", "Moam", "Shazzrah", 
 	"Fankriss the Unyielding", "Ouro", "Eye of C'Thun", "C'Thun", 
-	"Maexxna", "Patchwerk", "Loatheb", 
+	"Maexxna", "Patchwerk", "Noth the Plaguebringer", "Loatheb", 
 }
-local no_scorches_bosses = {"Ossirian the Unscarred",}
+
+local no_scorches_bosses = {"Ossirian the Unscarred", "Feugen",}
 local no_scorches_instances = {"Molten Core", "Blackwing Lair", "Onyxia\'s Lair",}
+local no_ff_bosses = {"Lethon", "Ysondre", "Taerar", "Emeriss",}
 
 function SDC_OnLoad()
 	reset_settings()
@@ -89,6 +91,8 @@ function SDCHelp()
 	SDCChat("Sets the display of Thunderclap. By default, it only displays it on some dangerous bosses. ")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc nf default | always | never")
 	SDCChat("Sets the display of Nightfall (default: OFF, except on some bosses)")
+	DEFAULT_CHAT_FRAME:AddMessage("/sdc annihilator")
+	SDCChat("Toggles the display of Annihilator (default: OFF)")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc dragonling default | always | never")
 	SDCChat("Sets the display of the Dragonling's debuffs (default: OFF, except some bosses)")
 	DEFAULT_CHAT_FRAME:AddMessage("/sdc all")
@@ -127,6 +131,7 @@ function reset_settings()
 	displayNightfall = false
 	defaultDragonling = true
 	displayDragonling = false
+	displayAnnihilator = false
 end
 
 function all_true()
@@ -147,6 +152,7 @@ function all_true()
 	displayNightfall = true
 	defaultDragonling = false
 	displayDragonling = true
+	displayAnnihilator = true
 end
 
 function settings(msg)
@@ -216,6 +222,8 @@ function settings(msg)
 		else wrong_command()
 		end
 
+	elseif msg == "annihilator" then displayAnnihilator = not displayAnnihilator
+
 	else wrong_command()
 	end
 
@@ -255,6 +263,7 @@ function settings(msg)
 	if defaultNightfall then current = current .. "default, "
 	else current = current .. tostring(displayNightfall) .. ", "
 	end
+	current = current .. "Annihilator: " .. tostring(displayAnnihilator) .. ", "
 	current = current .. "Dragonling: "
 	if defaultDragonling then current = current .. "default. "
 	else current = current .. tostring(displayDragonling) .. ". "
@@ -299,8 +308,8 @@ function SmartDebuffCheck(msg)
 	end
 	
 	if UnitExists("target") and UnitCanAttack("target", "player") then
-		CoS, CoE, CoR, FF, Scorch, SW, SA, WC, Demo, TC, Nightfall, Dragonling = false, false, false, false, false, false, false, false, false, false, false, false
-		ScorchN, WCN, SWN, SAN, DragonlingN = 0, 0, 0, 0, 0
+		CoS, CoE, CoR, FF, Scorch, SW, SA, WC, Demo, TC, Nightfall, Dragonling, Annihilator = false, false, false, false, false, false, false, false, false, false, false, false, false
+		ScorchN, WCN, SWN, SAN, DragonlingN, AnnihilatorN = 0, 0, 0, 0, 0, 0
 		i = 1
 		trashN = 0
 		t = "Trash debuffs:"
@@ -335,6 +344,9 @@ function SmartDebuffCheck(msg)
 			elseif db == "Interface\\Icons\\Spell_Fire_Fireball" then
 				Dragonling = true
 				DragonlingN = stack
+			elseif db == "Interface\\Icons\\INV_Axe_12" then
+				Annihilator = true
+				AnnihilatorN = stack
 			elseif not has_value(allowed_debuffs, db) then
 				t = t.." "..i..": "..string.sub(db, 17, -1)..","
 			end
@@ -417,10 +429,22 @@ function SmartDebuffCheck(msg)
 				s = s.." "..(5 - SWN).."xSW,"
 			end
 		end
-		if displayFF and druid and not FF then s = s.." Faerie Fire," end
+		if displayFF and druid and not FF and not has_value(no_ff_bosses, target) then s = s.." Faerie Fire," end
 		
-		if not defaultNightfall and displayNightfall or defaultNightfall and has_value(nightfall_bosses, target) then
-			if not Nightfall then s = s.." Nightfall," end
+		if warrior or shaman then
+			if not defaultNightfall and displayNightfall or defaultNightfall and has_value(nightfall_bosses, target) then
+				if not Nightfall then s = s.." Nightfall," end
+			end
+		end
+		
+		if warrior then
+			if displayAnnihilator then
+				if not Annihilator then
+					s = s.." Annihilator,"
+				elseif AnnihilatorN and AnnihilatorN < 5 then
+					s = s.." "..(5 - AnnihilatorN).."xAnnihilator,"
+				end
+			end
 		end
 		
 		if not defaultDragonling and displayDragonling or defaultDragonling and has_value(dragonling_bosses, target) then
