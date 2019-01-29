@@ -441,8 +441,8 @@ function SmartDebuffCheck(msg)
 			if displayAnnihilator then
 				if not Annihilator then
 					s = s.." Annihilator,"
-				elseif AnnihilatorN and AnnihilatorN < 5 then
-					s = s.." "..(5 - AnnihilatorN).."xAnnihilator,"
+				elseif AnnihilatorN and AnnihilatorN < 3 then
+					s = s.." "..(3 - AnnihilatorN).."xAnnihilator,"
 				end
 			end
 		end
